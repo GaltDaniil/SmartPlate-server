@@ -19,20 +19,36 @@ telegramBot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
 
-    // Отправить текст на OpenAI API и получить ответ
-    const response = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: text }],
+    /* if (text === '/start') {
+        await telegramBot.sendMessage(chatId, 'Ниже появится кнопка, запросить рацион', {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: 'Запрос рациона',
+                            web_app: {
+                                url: 'https://64253492e183442ecfabb646--comfy-swan-8b9193.netlify.app/',
+                            },
+                        },
+                    ],
+                ],
+            },
+        });
+    } */
+
+    const response = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt: text,
+        /* messages: [{ role: 'user', content: text }], */
         temperature: 0.7,
-        max_tokens: 2049,
+        max_tokens: 3500,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
     });
-    console.log(response.data.choices[0]);
+    console.log(response.data.choices[0].text);
 
-    // Отправить ответ пользователю в Telegram
-    const message = response.data.choices[0].message.content;
+    const message = response.data.choices[0].text.trim();
     telegramBot.sendMessage(chatId, message);
 });
 
