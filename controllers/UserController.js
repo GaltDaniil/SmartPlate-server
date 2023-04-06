@@ -13,16 +13,21 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export const subscribe = async (data) => {
+export const subscribe = async (req, res) => {
     try {
-        const doc = new UserModel({
-            userId: data.id,
-            name: data.first_name,
-            userName: data.username,
-        });
+        console.log(req);
+        const userId = req.id;
+        const alreadyUser = UserModel.findOne({ userId: userId });
 
-        const user = await doc.save();
-        console.log(user);
+        if (!alreadyUser) {
+            const doc = new UserModel({
+                userId: data.id,
+                name: data.first_name,
+                userName: data.username,
+            });
+
+            const user = await doc.save();
+        }
     } catch (error) {
         console.log(error);
     }
@@ -83,6 +88,43 @@ export const getInfo = async (req, res) => {
         console.log(userData);
 
         res.status(200).json(userData);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            massage: 'Ошибка со стороны сервера',
+        });
+    }
+};
+
+export const pay30 = async (req, res) => {
+    try {
+        //const userId = req.body.user.id;
+        const userId = req.body.userId;
+        const userPayInfo = req.body.info;
+
+        const filter = { userId: userId };
+        const update = { $inc: { tokens: 30 }, $push: { paymentInfo: userPayInfo } };
+        const options = { new: true };
+
+        const user = await UserModel.findOneAndUpdate(filter, update, options);
+
+        const requestText = req.body.requestText;
+        const response = await openai.createCompletion({
+            model: 'text-davinci-003',
+            prompt: requestText,
+            // messages: [{ role: 'user', content: text }]
+            temperature: 0.7,
+            max_tokens: 3500,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+        });
+
+        const message = response.data.choices[0].text.trim();
+        telegramBot.sendMessage(userId, message);
+        res.status(200).json({
+            massage: 'Рацион в процессе создания',
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({
