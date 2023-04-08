@@ -135,7 +135,7 @@ export const pay30 = async (req, res) => {
 };
 export const test = async (req, res) => {
     try {
-        console.log(req.query);
+        /* console.log(req.query);
 
         const counter = '51944414';
         const url =
@@ -177,7 +177,7 @@ export const test = async (req, res) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-
+ */
         res.status(200).json({
             massage: 'тест пройден',
         });
