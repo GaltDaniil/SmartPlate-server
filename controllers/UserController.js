@@ -3,7 +3,6 @@ import { Configuration, OpenAIApi } from 'openai';
 import dotenv from 'dotenv';
 import { telegramBot } from '../server.js';
 import mongoose from 'mongoose';
-import axios from 'axios';
 
 dotenv.config();
 
@@ -97,7 +96,7 @@ export const getInfo = async (req, res) => {
     }
 };
 
-export const pay30 = async (req, res) => {
+export const pay = async (req, res) => {
     try {
         //const userId = req.body.user.id;
         const userId = req.body.userId;
@@ -128,60 +127,6 @@ export const pay30 = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            massage: 'Ошибка со стороны сервера',
-        });
-    }
-};
-export const test = async (req, res) => {
-    try {
-        console.log(req.query);
-
-        const counter = '51944414';
-        const url =
-            'https://api-metrika.yandex.net/management/v1/counter/' +
-            counter +
-            '/offline_conversions/upload?client_id_type=CLIENT_ID';
-        const token = 'OAuth y0_AgAAAAANC5vZAAmpJwAAAADgayz1NvP4VW0fT-OpO6EZ7cLgc5Q0Cw0';
-
-        const data = {
-            ClientId: req.query.uclid,
-            Target: 'nutri_2990',
-            DateTime: req.query.date,
-            Price: '2990',
-            Currency: 'RUB',
-        };
-
-        // Получаем ключи объекта в виде массива
-        const headers = Object.keys(data);
-
-        // Получаем значения объекта в виде массива
-        const values = Object.values(data);
-
-        // Объединяем ключи и значения в один массив
-        const rows = [headers.join(','), values.join(',')];
-
-        // Преобразуем массив в строку CSV
-        const csvData = rows.join('\n');
-
-        console.log(csvData);
-
-        // Создание объекта FormData и добавление данных в него
-        const formData = new FormData();
-
-        formData.append('file', new Blob([csvData], { type: 'text/csv' }), 'data.csv');
-
-        const response = await axios.post(url, formData, {
-            headers: {
-                Authorization: token,
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        res.status(200).json({
-            massage: 'тест пройден',
-        });
-    } catch (error) {
         res.status(500).json({
             massage: 'Ошибка со стороны сервера',
         });

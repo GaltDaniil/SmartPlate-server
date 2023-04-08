@@ -5,8 +5,9 @@ const router = new Router();
 
 router.post('/sub', UserController.subscribe);
 router.post('/unsub', UserController.unsubscribe);
+router.post('/sendGpt', UserController.sendGpt);
 router.post('/send', UserController.sendGpt);
 router.get('/:id', UserController.getInfo);
-router.post('/test', UserController.test);
+router.post('/pay', UserController.pay);
 
 export default router;
