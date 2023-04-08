@@ -7,6 +7,6 @@ router.post('/sub', UserController.subscribe);
 router.post('/unsub', UserController.unsubscribe);
 router.post('/send', UserController.sendGpt);
 router.get('/:id', UserController.getInfo);
-router.get('/test', UserController.test);
+router.post('/test', UserController.test);
 
 export default router;
