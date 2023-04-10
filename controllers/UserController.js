@@ -13,10 +13,10 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export const subscribe = async (req, res) => {
+export const subscribe = async (data) => {
     try {
         console.log(req);
-        const userId = req.chat.id;
+        const userId = data.id;
         const alreadyUser = UserModel.findOne({ userId: userId });
 
         if (!alreadyUser) {

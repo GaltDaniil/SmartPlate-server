@@ -27,7 +27,6 @@ app.use(cors());
 app.use('/api', router);
 
 telegramBot.on('message', async (msg) => {
-    console.log(msg);
     const text = msg.text;
     const chatId = msg.chat.id;
     if (text === '/start') {
