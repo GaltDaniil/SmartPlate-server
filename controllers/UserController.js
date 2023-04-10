@@ -16,7 +16,7 @@ const openai = new OpenAIApi(configuration);
 export const subscribe = async (req, res) => {
     try {
         console.log(req);
-        const userId = req.id;
+        const userId = req.chat.id;
         const alreadyUser = UserModel.findOne({ userId: userId });
 
         if (!alreadyUser) {
