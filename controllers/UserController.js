@@ -102,11 +102,14 @@ export const pay = async (req, res) => {
         const userId = req.body.userId;
         const amount = req.body.amount;
 
-        const filter = { userId: userId };
-        const paymentInfo = { date: req.body.date, email: req.body.email };
-        let update;
+        console.log(req.body);
 
-        if (amount === 1) {
+        const filter = { userId: userId };
+        const paymentInfo = { amount: amount, date: new Date() };
+        let update;
+        console.log(filter);
+
+        if (amount === 129) {
             update = { $inc: { tokens: +10 }, $push: { paymentInfo: paymentInfo } };
         } else if (amount === 299) {
             update = { $inc: { tokens: +30 }, $push: { paymentInfo: paymentInfo } };
@@ -116,8 +119,11 @@ export const pay = async (req, res) => {
 
         //const update = { $inc: { tokens: 30 }, $push: { paymentInfo: userPayInfo } };
         const options = { new: true };
+        console.log(update);
+        console.log(paymentInfo);
         const user = await UserModel.findOneAndUpdate(filter, update, options);
-        console.log(`Оплата прошла. Начислилость ${amount} токенов`);
+        console.log(user);
+        console.log(`Оплата прошла в размере ${amount} рублей.`);
 
         res.status(200).json({
             massage: 'Оплата прошла успешно',
