@@ -100,30 +100,27 @@ export const pay = async (req, res) => {
     try {
         //const userId = req.body.user.id;
         const userId = req.body.userId;
-        const userPayInfo = req.body.info;
+        const amount = req.body.amount;
 
         const filter = { userId: userId };
-        const update = { $inc: { tokens: 30 }, $push: { paymentInfo: userPayInfo } };
+        const paymentInfo = { date: req.body.date, email: req.body.email };
+        let update;
+
+        if (amount === 1) {
+            update = { $inc: { tokens: +10 }, $push: { paymentInfo: paymentInfo } };
+        } else if (amount === 299) {
+            update = { $inc: { tokens: +30 }, $push: { paymentInfo: paymentInfo } };
+        } else if (amount === 549) {
+            update = { $inc: { tokens: +60 }, $push: { paymentInfo: paymentInfo } };
+        }
+
+        //const update = { $inc: { tokens: 30 }, $push: { paymentInfo: userPayInfo } };
         const options = { new: true };
-
         const user = await UserModel.findOneAndUpdate(filter, update, options);
+        console.log(`Оплата прошла. Начислилость ${amount} токенов`);
 
-        const requestText = req.body.requestText;
-        const response = await openai.createCompletion({
-            model: 'text-davinci-003',
-            prompt: requestText,
-            // messages: [{ role: 'user', content: text }]
-            temperature: 0.7,
-            max_tokens: 3500,
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
-        });
-
-        const message = response.data.choices[0].text.trim();
-        telegramBot.sendMessage(userId, message);
         res.status(200).json({
-            massage: 'Рацион в процессе создания',
+            massage: 'Оплата прошла успешно',
         });
     } catch (error) {
         console.log(error);
