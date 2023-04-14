@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        profession: {
+            type: String,
+            default: '',
+        },
         subscription: {
             type: Boolean,
             default: true,

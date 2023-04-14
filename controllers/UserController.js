@@ -15,7 +15,6 @@ const openai = new OpenAIApi(configuration);
 
 export const subscribe = async (data) => {
     try {
-        console.log(req);
         const userId = data.id;
         const alreadyUser = UserModel.findOne({ userId: userId });
 
@@ -28,6 +27,7 @@ export const subscribe = async (data) => {
 
             const user = await doc.save();
         }
+        console.log('Пользователь существует');
     } catch (error) {
         console.log(error);
     }
