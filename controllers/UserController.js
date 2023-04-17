@@ -62,7 +62,7 @@ export const sendGpt = async (req, res) => {
             prompt: requestText,
             // messages: [{ role: 'user', content: text }]
             temperature: 0.7,
-            max_tokens: 3500,
+            max_tokens: 3000,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -75,6 +75,7 @@ export const sendGpt = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
+        console.log(error.response.data);
         res.status(500).json({
             massage: 'Ошибка со стороны сервера',
         });
@@ -85,6 +86,18 @@ export const getInfo = async (req, res) => {
         const userId = req.params.id;
 
         const userData = await UserModel.findOne({ userId: userId });
+
+        res.status(200).json(userData);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            massage: 'Ошибка со стороны сервера',
+        });
+    }
+};
+export const getAll = async (req, res) => {
+    try {
+        const userData = await UserModel.find();
         console.log(userData);
 
         res.status(200).json(userData);

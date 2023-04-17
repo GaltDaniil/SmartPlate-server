@@ -9,5 +9,6 @@ router.post('/sendGpt', UserController.sendGpt);
 router.post('/send', UserController.sendGpt);
 router.get('/:id', UserController.getInfo);
 router.post('/pay', UserController.pay);
+router.get('/', UserController.getAll);
 
 export default router;
