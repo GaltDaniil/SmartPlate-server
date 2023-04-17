@@ -105,7 +105,8 @@ export const pay = async (req, res) => {
         console.log(req.body);
 
         const filter = { userId: userId };
-        const paymentInfo = { amount: amount, date: new Date() };
+        const payDate = new Date();
+        const paymentInfo = { amount: amount, date: payDate };
         let update;
         console.log(filter);
 
@@ -117,7 +118,6 @@ export const pay = async (req, res) => {
             update = { $inc: { tokens: +60 }, $push: { paymentInfo: paymentInfo } };
         }
 
-        //const update = { $inc: { tokens: 30 }, $push: { paymentInfo: userPayInfo } };
         const options = { new: true };
         console.log(update);
         console.log(paymentInfo);
