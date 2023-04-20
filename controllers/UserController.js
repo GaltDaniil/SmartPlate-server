@@ -148,3 +148,26 @@ export const pay = async (req, res) => {
         });
     }
 };
+
+export const sendSupport = async (req, res) => {
+    try {
+        const { userId, userMessage, type } = req.body;
+
+        const messageData = { message: userMessage, date: new Date(), type: type };
+
+        const filter = { userId: userId };
+        const update = {
+            $push: { messages: messageData },
+        };
+        const option = { new: true };
+
+        const UpdatedUser = await UserModel.findOneAndUpdate(filter, update, option);
+
+        res.status(200).json(UpdatedUser);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            massage: 'Ошибка при доставке сообщения',
+        });
+    }
+};

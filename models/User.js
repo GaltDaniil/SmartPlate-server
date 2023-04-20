@@ -51,6 +51,10 @@ const UserSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        messages: {
+            type: Array,
+            default: [],
+        },
     },
     {
         timestamps: true,
