@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        avatar: {
+            type: String,
+            default: '',
+        },
         phone: {
             type: String,
             default: '',
@@ -29,11 +33,30 @@ const UserSchema = new mongoose.Schema(
         },
         tokens: {
             type: Number,
-            default: 2,
+            default: 20,
         },
         diets: {
             type: Number,
             default: 0,
+        },
+        bots: {
+            type: Object,
+            default: {
+                Jora: true,
+                Fita: false,
+                Kostya: false,
+                Slava: false,
+                Victorya: false,
+                Ilon: false,
+                Knopka: false,
+            },
+        },
+        chatSession: {
+            type: Object,
+            default: {
+                activeBot: '',
+                session: [],
+            },
         },
         requests: {
             type: Number,

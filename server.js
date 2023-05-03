@@ -4,10 +4,12 @@ import * as dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './routes/routes.js';
-import { subscribe } from './controllers/UserController.js';
+import { subscribe, arraySession } from './controllers/UserController.js';
+import { askBot, stopBot } from './controllers/BotController.js';
+import { answerTimer } from './middleware/botConnect.js';
 
 dotenv.config();
-const TG_TOKEN = process.env.TELEGRAM_TOKEN || '6190338160:AAFj9p1BCGiUMLHjSVn7VTrmUAaY5vsBwEY';
+const TG_TOKEN = process.env.TELEGRAM_TOKEN || '6067961898:AAGWa-_L2hbWbENFYpl9yEeJA-o8vNwTTzs';
 
 export const telegramBot = new TelegramBot(TG_TOKEN, {
     polling: true,
@@ -30,27 +32,39 @@ telegramBot.on('message', async (msg) => {
     const text = msg.text;
     const chatId = msg.chat.id;
     if (text === '/start') {
+        /* const userAvatars = await telegramBot.getUserProfilePhotos(chatId);
+        if (userAvatars.total_count > 0) {
+            const avatar = userAvatars.photos[0][0];
+            console.log(avatar);
+            const file = await telegramBot.getFile(avatar.file_id);
+            console.log(file);
+            const avatarUrl = `https://api.telegram.org/file/bot${TG_TOKEN}/${file.file_path}`;
+            await subscribe(msg.chat, avatarUrl);
+        } else {
+            const avatarUrl = '';
+            await subscribe(msg.chat, avatarUrl);
+        } */
         await subscribe(msg.chat);
         await telegramBot.sendMessage(
             chatId,
-            '👋 Добро пожаловать в Smart Plate.\n \n🥗 Это уникальный онлайн-сервис, разработанный специально для фитнес тренеров и нутрициологов, которые хотят предоставлять своим клиентам индивидуальные рационы питания.\n \n🎛 Сервис предоставляет простой и эффективный инструмент, который помогает составлять оптимальные рационы питания, учитывая особенности клиента, его физическую активность, цели и предпочтения.\n \n🎁 Мы зачислили вам на счет бонусные токены. Попробуйте составить рацион прямо сейчас.\n \n⬇️ Для этого нажмите в левой части экрана на кнопку "Menu"',
-            /* {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: 'Запрос рациона',
-                                web_app: {
-                                    url: 'https://smartdietai.ru/',
-                                },
-                            },
-                        ],
-                    ],
-                },
-            }, */
+            '👋 Добро пожаловать в Smart Diet!\n \n🥑 Это уникальный онлайн-сервис, разработанный специально для нутрициологов и фитнес-тренеров, который умеет составлять сбалансированные рационы питания для снижения веса и вкусные рецепты.\n \n⏱ С нашим ботом вы сможете разрабатывать продукты, уделяя этому в десятки раз меньше времени, но сохраняя качество на высшем уровне.\n \n🧠 Бот учитывает все нюансы сбалансированного питания для снижения веса и сохранения здоровья.\n \n🎁 Мы зачислили вам на счет бонусные токены. Попробуйте составить рацион бесплатно прямо сейчас. 1 запрос = 1 токену.\n \n⬇️ Для этого нажмите в левой части экрана кнопку "Open"',
         );
     }
+
+    /* const currentSession = await arraySession(msg.chat);
+    if (currentSession.activeBot) {
+        console.log('session is starting');
+        askBot(chatId, text);
+    } */
 });
+
+/* telegramBot.on('callback_query', async (query) => {
+    const chatId = query.message.chat.id;
+
+    if (query.data === 'end_session') {
+        await stopBot(chatId);
+    }
+}); */
 
 app.listen(8080, () => {
     console.log('server is ok on PORT ');
