@@ -79,13 +79,6 @@ export const askBot = async (userId, text) => {
         //Проверка на наличие токенов у пользователя
 
         const { tokens, chatSession } = await UserModel.findOne(filter);
-        if (tokens < 1) {
-            telegramBot.sendMessage(
-                userId,
-                'У вас закончились токены 😞 Пожалуйста, пополните баланс.',
-            );
-            return await stopBot(userId);
-        }
 
         telegramBot.sendChatAction(userId, 'typing');
 
