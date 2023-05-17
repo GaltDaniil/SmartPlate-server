@@ -28,16 +28,13 @@ const UserSchema = new mongoose.Schema(
             default: '',
         },
         subscription: {
-            type: Boolean,
-            default: true,
-        },
-        tokens: {
-            type: Number,
-            default: 20,
-        },
-        diets: {
-            type: Number,
-            default: 0,
+            type: Object,
+            default: {
+                freePeriod: true,
+                isActive: false,
+                dateStart: '',
+                dateEnd: '',
+            },
         },
         bots: {
             type: Object,
@@ -57,10 +54,6 @@ const UserSchema = new mongoose.Schema(
                 activeBot: '',
                 session: [],
             },
-        },
-        requests: {
-            type: Number,
-            default: 0,
         },
         members: {
             type: Array,
