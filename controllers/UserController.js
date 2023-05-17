@@ -80,7 +80,7 @@ export const pay = async (req, res) => {
         let days;
         if (amount === 299) {
             days = 2592000000;
-        } else if (amount === 799) {
+        } else if (amount === 699) {
             days = 7776000000;
         } else {
             days = 15552000000;
@@ -95,6 +95,7 @@ export const pay = async (req, res) => {
             if (today.getTime() > subscription.dateEnd.getTime()) {
                 update = {
                     $set: {
+                        'subscription.freePeriod': false,
                         'subscription.isActive': true,
                         'subscription.dateStart': today,
                         'subscription.dateEnd': new Date(today.getTime() + days),
@@ -104,6 +105,7 @@ export const pay = async (req, res) => {
             } else {
                 update = {
                     $set: {
+                        'subscription.freePeriod': false,
                         'subscription.isActive': true,
                         'subscription.dateEnd': new Date(subscription.dateEnd.getTime() + days),
                     },
@@ -113,6 +115,7 @@ export const pay = async (req, res) => {
         } else {
             update = {
                 $set: {
+                    'subscription.freePeriod': false,
                     'subscription.isActive': true,
                     'subscription.dateStart': today,
                     'subscription.dateEnd': new Date(today.getTime() + days),
@@ -122,6 +125,7 @@ export const pay = async (req, res) => {
         }
 
         console.log(`Оплата прошла в размере ${amount} рублей.`);
+        telegramBot.sendMessage(userId, 'Оплата прошла успешно.');
 
         res.status(200).json({
             massage: 'Оплата прошла успешно',

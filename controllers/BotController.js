@@ -1,9 +1,8 @@
 import UserModel from '../models/User.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { telegramBot } from '../server.js';
-import { session } from 'telegraf';
 import { answerTimer, startTimer } from '../middleware/botConnect.js';
-import { checkSub2 } from '../middleware/checkSubscribe.js';
+import { checkSub } from '../middleware/checkSubscribe.js';
 
 const configuration = new Configuration({
     apiKey: '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',
@@ -76,7 +75,7 @@ export const askBot = async (userId, text) => {
     try {
         const filter = { userId: userId };
         const options = { new: true };
-        const checkSubscribe = checkSub2();
+        const checkSubscribe = checkSub();
         if (!checkSubscribe) {
             return telegramBot.sendMessage(
                 userId,
