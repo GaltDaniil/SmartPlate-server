@@ -58,25 +58,6 @@ export const chooseBot = async (req, res, next) => {
         });
     }
 };
-
-export const checkToken = async (req, res, next) => {
-    try {
-        const userId = req.body.userId;
-        const filter = { userId };
-        const { tokens } = await UserModel.findOne(filter);
-
-        if (tokens < 1) {
-            return telegramBot.sendMessage(
-                userId,
-                'У вас закончились токены 😞 Пожалуйста, пополните баланс.',
-            );
-        }
-        next();
-    } catch (error) {
-        console.log(error);
-        console.log('Ошбика в проверке токенов');
-    }
-};
 export const checkChatSession = async (req, res, next) => {
     try {
         const userId = req.body.userId;
@@ -96,6 +77,7 @@ export const checkChatSession = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         console.log('Ошбика в проверке токенов');
+        res.status(500);
     }
 };
 

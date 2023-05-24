@@ -13,6 +13,10 @@ const openai = new OpenAIApi(configuration);
 export const addNewUser = async (data, avatarUrl) => {
     try {
         const userId = data.id;
+        const today = new Date();
+        const freePeriod = new Date(today.getTime() + 259200000);
+        console.log(today);
+        console.log(freePeriod);
 
         const alreadyUser = await UserModel.findOne({ userId: userId });
         if (!alreadyUser) {
@@ -21,6 +25,10 @@ export const addNewUser = async (data, avatarUrl) => {
                 name: data.first_name,
                 userName: data.username,
                 avatar: avatarUrl,
+                subscription: {
+                    isActive: false,
+                    dateEnd: freePeriod,
+                },
             });
 
             const user = await doc.save();
@@ -90,36 +98,25 @@ export const pay = async (req, res) => {
         const { subscription } = await UserModel.findOne(filter);
 
         let update = {};
-        if (subscription.dateEnd) {
-            //Если подписка уже закончилась
-            if (today.getTime() > subscription.dateEnd.getTime()) {
-                update = {
-                    $set: {
-                        'subscription.freePeriod': false,
-                        'subscription.isActive': true,
-                        'subscription.dateStart': today,
-                        'subscription.dateEnd': new Date(today.getTime() + days),
-                    },
-                };
-                await UserModel.findOneAndUpdate(filter, update);
-            } else {
-                update = {
-                    $set: {
-                        'subscription.freePeriod': false,
-                        'subscription.isActive': true,
-                        'subscription.dateEnd': new Date(subscription.dateEnd.getTime() + days),
-                    },
-                };
-                await UserModel.findOneAndUpdate(filter, update);
-            }
+
+        if (today.getTime() > subscription.dateEnd.getTime()) {
+            update = {
+                $set: {
+                    'subscription.isActive': true,
+                    'subscription.dateEnd': new Date(today.getTime() + days),
+                    isNotificationSent: false,
+                },
+                $push: { paymentInfoamout: { amount: amount, datePay: today } },
+            };
+            await UserModel.findOneAndUpdate(filter, update);
         } else {
             update = {
                 $set: {
-                    'subscription.freePeriod': false,
                     'subscription.isActive': true,
-                    'subscription.dateStart': today,
-                    'subscription.dateEnd': new Date(today.getTime() + days),
+                    'subscription.dateEnd': new Date(subscription.dateEnd.getTime() + days),
+                    isNotificationSent: false,
                 },
+                $push: { paymentInfoamout: { amount: amount, datePay: today } },
             };
             await UserModel.findOneAndUpdate(filter, update);
         }

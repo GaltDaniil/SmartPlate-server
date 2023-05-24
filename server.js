@@ -7,6 +7,7 @@ import router from './routes/routes.js';
 import { addNewUser, arraySession } from './controllers/UserController.js';
 import { askBot, stopBot } from './controllers/BotController.js';
 import { answerTimer } from './middleware/botConnect.js';
+import { notification } from './middleware/checkSubscribe.js';
 
 dotenv.config();
 const TG_TOKEN = process.env.TELEGRAM_TOKEN || '6067961898:AAGWa-_L2hbWbENFYpl9yEeJA-o8vNwTTzs';
@@ -66,6 +67,7 @@ telegramBot.on('message', async (msg) => {
         await stopBot(chatId);
     }
 }); */
+setInterval(notification, 1000 * 60 * 60 * 24);
 
 app.listen(8080, () => {
     console.log('server is ok on PORT ');

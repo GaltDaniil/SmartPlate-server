@@ -2,7 +2,6 @@ import UserModel from '../models/User.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { telegramBot } from '../server.js';
 import { answerTimer, startTimer } from '../middleware/botConnect.js';
-import { checkSub } from '../middleware/checkSubscribe.js';
 
 const configuration = new Configuration({
     apiKey: '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',
@@ -10,8 +9,8 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 export const startBot = async (req, res) => {
+    const userId = req.body.userId;
     try {
-        const userId = req.body.userId;
         const bot = req.body.bot;
         const systemData = req.body.system;
 
@@ -65,6 +64,10 @@ export const startBot = async (req, res) => {
         console.log(error);
         console.log(error.response.data);
         console.log('Ошибка при старте бота');
+        telegramBot.sendMessage(
+            userId,
+            'Возникла ошибка при старте бота. Ничего страшного, возможно бот на расхват. Просто перезапустите его еще раз 😌',
+        );
         res.status(500).json({
             massage: 'Ошибка со стороны сервера',
         });
@@ -75,13 +78,6 @@ export const askBot = async (userId, text) => {
     try {
         const filter = { userId: userId };
         const options = { new: true };
-        const checkSubscribe = checkSub();
-        if (!checkSubscribe) {
-            return telegramBot.sendMessage(
-                userId,
-                'Пробный период окончен, пожалуйста оплатите подписку.',
-            );
-        }
 
         const { chatSession } = await UserModel.findOne(filter);
 
@@ -143,9 +139,10 @@ export const askBot = async (userId, text) => {
         console.log(error);
         console.log(error.response.data);
         console.log(error.response.data.error.message);
-        res.status(500).json({
-            massage: 'Ошибка при отправке запроса в бота',
-        });
+        telegramBot.sendMessage(
+            userId,
+            'Возникла ошибка при отправке запроса на сервер. Ничего страшного, просто перезапустите бота еще раз 😌',
+        );
     }
 };
 

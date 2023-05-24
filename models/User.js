@@ -30,9 +30,7 @@ const UserSchema = new mongoose.Schema(
         subscription: {
             type: Object,
             default: {
-                freePeriod: true,
                 isActive: false,
-                dateStart: '',
                 dateEnd: '',
             },
         },
@@ -70,6 +68,10 @@ const UserSchema = new mongoose.Schema(
         messages: {
             type: Array,
             default: [],
+        },
+        isNotificationSent: {
+            type: Boolean,
+            default: false,
         },
     },
     {

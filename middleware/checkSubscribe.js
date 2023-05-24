@@ -1,38 +1,52 @@
 import UserModel from '../models/User.js';
+import { telegramBot } from '../server.js';
 
-export const checkSub = async (userId) => {
+export const notification = async () => {
     try {
-        const { subscription, createdAt } = await UserModel.findOne(userId);
+        const users = await UserModel.find({
+            'subscription.dateEnd': { $lt: new Date() },
+            isNotificationSent: false,
+        });
+
+        users.forEach(async (el) => {
+            telegramBot.sendMessage(
+                el.userId,
+                'Подписка на Fitness Ikig.Ai - окончена. Чтобы продолжить пользоваться нашими ботами, пожалуйста продлите подписку ❤️',
+            );
+            await UserModel.findOneAndUpdate(
+                { userId: el.userId },
+                { $set: { isNotificationSent: true } },
+            );
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('Ощибка при отправке уведомлений');
+    }
+};
+
+export const checkSubscribe = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        const { subscription } = await UserModel.findOne({ userId });
 
         const today = new Date();
-        const differenceInMs = today.getTime() - createdAt.getTime();
-        const differenceFreePeriodDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
 
-        if (!subscription.freePeriod) {
-            if (subscription.dateEnd) {
-                const diffTarifInMs = today.getTime() - subscription.dateEnd.getTime();
-                if (diffTarifInMs <= 0) {
-                    return true;
-                } else {
-                    await UserModel.findOneAndUpdate(
-                        { userId: userId },
-                        { $set: { 'subscription.isActive': false } },
-                    );
-                    return false;
-                }
+        if (subscription.dateEnd) {
+            const diffTarifInMs = today.getTime() - subscription.dateEnd.getTime();
+            if (diffTarifInMs <= 0) {
+                next();
             } else {
-                return false;
+                await UserModel.findOneAndUpdate(
+                    { userId: userId },
+                    { $set: { 'subscription.isActive': false } },
+                );
+                next();
             }
-        } else if (differenceFreePeriodDays <= 3) {
-            return true;
         } else {
-            await UserModel.findOneAndUpdate(
-                { userId: userId },
-                { $set: { 'subscription.freePeriod': false } },
-            );
-            return false;
+            next();
         }
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: 'Ошибка в функции при проверке подписки' });
     }
 };
