@@ -33,8 +33,9 @@ export const addNewUser = async (data, avatarUrl) => {
 
             const user = await doc.save();
             console.log('Пользователь создан');
+        } else {
+            console.log('Пользователь существует');
         }
-        console.log('Пользователь существует');
     } catch (error) {
         console.log(error);
     }

@@ -138,7 +138,6 @@ export const askBot = async (userId, text) => {
     } catch (error) {
         console.log(error);
         console.log(error.response.data);
-        console.log(error.response.data.error.message);
         telegramBot.sendMessage(
             userId,
             'Возникла ошибка при отправке запроса на сервер. Ничего страшного, просто перезапустите бота еще раз 😌',

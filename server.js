@@ -4,12 +4,10 @@ import * as dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './routes/routes.js';
-import { addNewUser, arraySession } from './controllers/UserController.js';
-import { askBot, stopBot } from './controllers/BotController.js';
-import { answerTimer } from './middleware/botConnect.js';
-import { notification } from './middleware/checkSubscribe.js';
+import { addNewUser } from './controllers/UserController.js';
 
 dotenv.config();
+
 const TG_TOKEN = process.env.TELEGRAM_TOKEN || '6067961898:AAGWa-_L2hbWbENFYpl9yEeJA-o8vNwTTzs';
 
 export const telegramBot = new TelegramBot(TG_TOKEN, {
@@ -52,22 +50,7 @@ telegramBot.on('message', async (msg) => {
             '👋 Добро пожаловать!\n \n🥑 Это уникальный онлайн-сервис, разработанный специально для нутрициологов и фитнес-тренеров.\n \n⏱ С нашим ботом вы сможете разрабатывать продукты, уделяя этому в десятки раз меньше времени, но сохраняя качество на высшем уровне.\n \n🧠 На данный момент есть 2 бота:\n \n🥑 Бот-нутрициолог. Ответит на любой вопрос в сфере нутрициологии и здорового питания. Составит рацион, рассчитает КБЖУ, найдет информацию о любом продукте и поможет составить рецепты из них. \n \n🖌 Бот-копирайтер. За вас напишет любой текст на любую тему в нужной вам стилистике. Это может быть статья в блог, текст для рекламного объявления или рассылки, так же подскажет идеи для постов и проверит текст на ошибки и стилистику. \n \n 🎁  ⬇️ Начните общение с ботом-экспертом прямо сейчас нажав кнопку "Open"',
         );
     }
-
-    /* const currentSession = await arraySession(msg.chat);
-    if (currentSession.activeBot) {
-        console.log('session is starting');
-        askBot(chatId, text);
-    } */
 });
-
-/* telegramBot.on('callback_query', async (query) => {
-    const chatId = query.message.chat.id;
-
-    if (query.data === 'end_session') {
-        await stopBot(chatId);
-    }
-}); */
-setInterval(notification, 1000 * 60 * 60 * 24);
 
 app.listen(8080, () => {
     console.log('server is ok on PORT ');
