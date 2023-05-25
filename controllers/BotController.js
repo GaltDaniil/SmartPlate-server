@@ -74,7 +74,7 @@ export const startBot = async (req, res) => {
     }
 };
 
-export const askBot = async (userId, text) => {
+export const askBot = async (userId, text, retries = 2) => {
     try {
         const filter = { userId: userId };
         const options = { new: true };
@@ -138,10 +138,15 @@ export const askBot = async (userId, text) => {
     } catch (error) {
         console.log(error);
         console.log(error.response.data);
-        telegramBot.sendMessage(
-            userId,
-            'Возникла ошибка при отправке запроса на сервер. Ничего страшного, просто перезапустите бота еще раз 😌',
-        );
+        if (retries > 0) {
+            console.log(`Ошибка. Повторный запрос (${retries} попыток осталось)`);
+            await askBot(userId, text, retries - 1);
+        } else {
+            telegramBot.sendMessage(
+                userId,
+                'Возникла ошибка при отправке запроса на сервер. Ничего страшного, просто перезапустите бота еще раз 😌',
+            );
+        }
     }
 };
 
