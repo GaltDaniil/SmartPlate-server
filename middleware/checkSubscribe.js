@@ -1,30 +1,4 @@
 import UserModel from '../models/User.js';
-import { telegramBot } from '../server.js';
-
-export const notification = async () => {
-    try {
-        console.log('Старт функции');
-        // const users = await UserModel.find({
-        //     'subscription.dateEnd': { $lt: new Date() },
-        //     isNotificationSent: false,
-        // });
-
-        // users.forEach((el) => {
-        //     console.log(el.userId);
-        // telegramBot.sendMessage(
-        //     el.userId,
-        //     'Подписка на Fitness Ikig.Ai - окончена. Чтобы продолжить пользоваться нашими ботами, пожалуйста продлите подписку ❤️',
-        // );
-        // await UserModel.findOneAndUpdate(
-        //     { userId: el.userId },
-        //     { $set: { isNotificationSent: true } },
-        // );
-        // });
-    } catch (error) {
-        console.log(error);
-        console.log('Ощибка при отправке уведомлений');
-    }
-};
 
 export const checkSubscribe = async (req, res, next) => {
     try {
@@ -32,9 +6,10 @@ export const checkSubscribe = async (req, res, next) => {
         const { subscription } = await UserModel.findOne({ userId });
 
         const today = new Date();
+        const dateEnd = new Date(subscription.dateEnd);
 
         if (subscription.dateEnd) {
-            const diffTarifInMs = today.getTime() - subscription.dateEnd.getTime();
+            const diffTarifInMs = today.getTime() - dateEnd.getTime();
             if (diffTarifInMs <= 0) {
                 next();
             } else {

@@ -100,21 +100,34 @@ export const pay = async (req, res) => {
 
         let update = {};
 
-        if (today.getTime() > subscription.dateEnd.getTime()) {
-            update = {
-                $set: {
-                    'subscription.isActive': true,
-                    'subscription.dateEnd': new Date(today.getTime() + days),
-                    isNotificationSent: false,
-                },
-                $push: { paymentInfoamout: { amount: amount, datePay: today } },
-            };
-            await UserModel.findOneAndUpdate(filter, update);
+        if (subscription.dateEnd) {
+            const dateEnd = new Date(subscription.dateEnd);
+            if (today.getTime() > dateEnd.getTime()) {
+                update = {
+                    $set: {
+                        'subscription.isActive': true,
+                        'subscription.dateEnd': new Date(today.getTime() + days),
+                        isNotificationSent: false,
+                    },
+                    $push: { paymentInfoamout: { amount: amount, datePay: today } },
+                };
+                await UserModel.findOneAndUpdate(filter, update);
+            } else {
+                update = {
+                    $set: {
+                        'subscription.isActive': true,
+                        'subscription.dateEnd': new Date(dateEnd.getTime() + days),
+                        isNotificationSent: false,
+                    },
+                    $push: { paymentInfoamout: { amount: amount, datePay: today } },
+                };
+                await UserModel.findOneAndUpdate(filter, update);
+            }
         } else {
             update = {
                 $set: {
                     'subscription.isActive': true,
-                    'subscription.dateEnd': new Date(subscription.dateEnd.getTime() + days),
+                    'subscription.dateEnd': new Date(today.getTime() + days),
                     isNotificationSent: false,
                 },
                 $push: { paymentInfoamout: { amount: amount, datePay: today } },
