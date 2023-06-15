@@ -96,7 +96,7 @@ export const pay = async (req, res) => {
         }
         //проверка наличия подписки на текущий момент
 
-        const { subscription } = await UserModel.findOne(filter);
+        const { userName, subscription } = await UserModel.findOne(filter);
 
         let update = {};
 
@@ -137,6 +137,8 @@ export const pay = async (req, res) => {
 
         console.log(`Оплата прошла в размере ${amount} рублей.`);
         telegramBot.sendMessage(userId, 'Оплата прошла успешно.');
+        telegramBot.sendMessage(299602933, `Пришла оплата от ${userName} в размере ${amount}.`);
+        telegramBot.sendMessage(360641449, `Пришла оплата от ${userName} в размере ${amount}.`);
 
         res.status(200).json({
             massage: 'Оплата прошла успешно',
@@ -162,6 +164,11 @@ export const sendSupport = async (req, res) => {
         const option = { new: true };
 
         const UpdatedUser = await UserModel.findOneAndUpdate(filter, update, option);
+
+        telegramBot.sendMessage(
+            299602933,
+            `Пришло сообщение в поддержку от ${userName} с текстом: ${userMessage}`,
+        );
 
         res.status(200).json(UpdatedUser);
     } catch (error) {
