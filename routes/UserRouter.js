@@ -5,7 +5,6 @@ import { checkSubscribe } from '../middleware/checkSubscribe.js';
 const router = new Router();
 
 router.get('/:id', checkSubscribe, UserController.getInfo);
-router.post('/pay', UserController.pay);
 router.get('/', UserController.getAll);
 router.post('/sendSupport', UserController.sendSupport);
 
