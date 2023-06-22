@@ -81,7 +81,7 @@ export const updateSubscribe = async (userId, amount) => {
                         'subscription.dateEnd': new Date(today.getTime() + days),
                         isNotificationSent: false,
                     },
-                    $push: { paymentInfo: { amount: amount, datePay: today } },
+                    $push: { paymentInfo: { amount: amount, date: today } },
                 };
                 await UserModel.findOneAndUpdate(filter, update);
             } else {
@@ -130,7 +130,6 @@ export const getInfo = async (req, res) => {
 export const getAll = async (req, res) => {
     try {
         const userData = await UserModel.find();
-        console.log(userData);
 
         res.status(200).json(userData);
     } catch (error) {

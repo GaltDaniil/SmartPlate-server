@@ -4,7 +4,7 @@ import { checkSubscribe } from '../middleware/checkSubscribe.js';
 
 const router = new Router();
 
-router.post('/pay', PayController.successCloudpayments);
+router.post('/cloudPayments', PayController.successCloudpayments);
 router.post('/create-payment', PayController.createPayPal);
 router.get('/success-payment', PayController.successPayPal);
 router.post('/decline-payment', PayController.declinePayPal);

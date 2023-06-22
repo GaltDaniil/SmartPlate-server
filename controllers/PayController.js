@@ -103,7 +103,6 @@ export const createPayPal = async (req, res) => {
             }
         }
         const approvalUrl = await createPayPalPayment(userId, amount);
-        console.log(approvalUrl);
         telegramBot.sendMessage(userId, approvalUrl);
 
         res.json({ approvalUrl });
@@ -127,9 +126,6 @@ export const successPayPal = async (req, res) => {
                 }
             });
         });
-        console.log(executePayment);
-        console.log(userId);
-        console.log(amount);
 
         telegramBot.sendMessage(userId, 'Оплата прошла успешно.');
         telegramBot.sendMessage(
