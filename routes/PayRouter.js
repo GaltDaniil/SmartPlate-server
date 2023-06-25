@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as PayController from '../controllers/PayController.js';
-import { checkSubscribe } from '../middleware/checkSubscribe.js';
 
 const router = new Router();
 

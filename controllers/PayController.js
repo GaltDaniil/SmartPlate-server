@@ -1,21 +1,12 @@
-import UserModel from '../models/User.js';
-import { Configuration, OpenAIApi } from 'openai';
 import { telegramBot } from '../server.js';
 import paypal from 'paypal-rest-sdk';
-import * as dotenv from 'dotenv';
 import { updateSubscribe } from './UserController.js';
-
-dotenv.config();
-
-const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 export const successCloudpayments = async (req, res) => {
     try {
         const { userId, amount } = req.body;
 
-        await updateSubscribe(userId, amount);
+        const userName = await updateSubscribe(userId, amount);
 
         console.log(`Оплата прошла в размере ${amount} рублей.`);
         telegramBot.sendMessage(userId, 'Оплата прошла успешно.');
