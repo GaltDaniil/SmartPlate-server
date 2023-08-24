@@ -1,8 +1,11 @@
 import { telegramBot } from '../server.js';
 import paypal from 'paypal-rest-sdk';
 import { updateSubscribe } from './UserController.js';
+import { Request, Response } from 'express';
 
-export const successCloudpayments = async (req, res) => {
+type PaymentFn = (req: Request, res: Response) => Promise<void>;
+
+export const successCloudpayments: PaymentFn = async (req, res) => {
     try {
         const { userId, amount } = req.body;
 
@@ -24,16 +27,16 @@ export const successCloudpayments = async (req, res) => {
     }
 };
 
-export const createPayPal = async (req, res) => {
+export const createPayPal: PaymentFn = async (req, res) => {
     try {
         const { userId, amount } = req.body;
-        let usdAmount = null;
+        let usdAmount = '';
         if (amount === 299) {
-            usdAmount = 3.8;
+            usdAmount = '3.8';
         } else if (amount === 699) {
-            usdAmount = 8.6;
+            usdAmount = '8.6';
         } else {
-            usdAmount = 17;
+            usdAmount = '17';
         }
         telegramBot.sendMessage(
             userId,
@@ -48,10 +51,10 @@ export const createPayPal = async (req, res) => {
                 'EKWuajk7-1VgLf7IL5rRqldElX59GzZ96ElqUkuaPEJeP_L1_r1A9QAHS3IGdA6SsTGITG5wYSZwD7hY',
         });
 
-        async function createPayPalPayment(userId, amount) {
+        async function createPayPalPayment(userId: Request, amount: Response) {
             try {
                 // Создаем объект платежа
-                const payment = {
+                const payment: paypal.Payment = {
                     intent: 'sale',
                     payer: {
                         payment_method: 'paypal',
@@ -71,22 +74,24 @@ export const createPayPal = async (req, res) => {
                 };
 
                 // Создаем платеж в PayPal
-                const createPayment = await new Promise((resolve, reject) => {
-                    paypal.payment.create(payment, (error, payment) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(payment);
-                        }
-                    });
-                });
+                const createPayment: paypal.PaymentResponse = await new Promise(
+                    (resolve, reject) => {
+                        paypal.payment.create(payment, (error, payment) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(payment);
+                            }
+                        });
+                    },
+                );
 
                 // Получаем ссылку на оплату
-                const approvalUrl = createPayment.links.find(
+                const approval_url = createPayment.links!.find(
                     (link) => link.rel === 'approval_url',
-                ).href;
+                )!.href;
 
-                return approvalUrl;
+                return approval_url;
             } catch (error) {
                 console.log(error);
                 console.log('Не удалось создать платеж PayPal.');
@@ -102,23 +107,37 @@ export const createPayPal = async (req, res) => {
     }
 };
 
-export const successPayPal = async (req, res) => {
+interface RequestQuery {
+    query: {
+        PayerID?: string;
+        paymentId: string;
+        userId: string;
+        amount: string;
+        usdAmount: string;
+    };
+}
+
+export const successPayPal = async (req: RequestQuery, res: Response) => {
     const { PayerID, paymentId, userId, amount, usdAmount } = req.query;
 
     try {
         const userName = await updateSubscribe(userId, amount);
         // Подтверждаем платеж в PayPal
         const executePayment = await new Promise((resolve, reject) => {
-            paypal.payment.execute(paymentId, { payer_id: PayerID }, (error, payment) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(payment);
-                }
-            });
+            paypal.payment.execute(
+                paymentId as string,
+                { payer_id: PayerID as string },
+                (error, payment) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(payment);
+                    }
+                },
+            );
         });
 
-        telegramBot.sendMessage(userId, 'Оплата прошла успешно.');
+        telegramBot.sendMessage(userId as string, 'Оплата прошла успешно.');
         telegramBot.sendMessage(
             299602933,
             `Пришла оплата PayPal от ${userName} в размере ${usdAmount}$.`,
@@ -134,7 +153,7 @@ export const successPayPal = async (req, res) => {
         console.log('Произошла ошибка при выполнении платежа.');
     }
 };
-export const declinePayPal = async (req, res) => {
-    const { PayerID, paymentId, userId } = req.query;
-    telegramBot.sendMessage(userId, 'Ошибка платежа через PayPal. Попробуйте еще раз.');
+export const declinePayPal: PaymentFn = async (req, res) => {
+    const { userId } = req.query;
+    telegramBot.sendMessage(userId as string, 'Ошибка платежа через PayPal. Попробуйте еще раз.');
 };

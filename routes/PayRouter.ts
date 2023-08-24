@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as PayController from '../controllers/PayController.js';
 
-const router = new Router();
+const router = Router();
 
 router.post('/cloudPayments', PayController.successCloudpayments);
 router.post('/create-payment', PayController.createPayPal);

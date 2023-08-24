@@ -1,5 +1,7 @@
 import { telegramBot } from '../server.js';
 import UserModel from '../models/User.js';
+import TelegramBot from 'node-telegram-bot-api';
+import { Middleware } from '../types/index.js';
 
 const bots = [
     {
@@ -36,7 +38,7 @@ const bots = [
     },
 ];
 
-export const chooseBot = async (req, res, next) => {
+export const chooseBot: Middleware = async (req, res, next) => {
     const userBot = req.body.bot;
     if (userBot) {
         try {
@@ -58,14 +60,12 @@ export const chooseBot = async (req, res, next) => {
         });
     }
 };
-export const checkChatSession = async (req, res, next) => {
+export const checkChatSession: Middleware = async (req, res, next) => {
     try {
         const userId = req.body.userId;
         const filter = { userId };
-        const { chatSession } = await UserModel.findOne(filter);
-        console.log(chatSession.session.length);
-
-        if (chatSession.session.length > 0) {
+        const user = await UserModel.findOne(filter);
+        if (user && user.chatSession.session.length > 0) {
             const update = { $set: { chatSession: { activeBot: '', session: [] } } };
             const options = { new: true };
 
@@ -81,44 +81,42 @@ export const checkChatSession = async (req, res, next) => {
     }
 };
 
-export const startTimer = (id) => {
+export const startTimer = (userId: string) => {
     return new Promise((resolve, reject) => {
         telegramBot.on('message', (msg) => {
-            if (msg.chat.id === Number(id)) {
+            if (msg.chat.id === Number(userId)) {
                 resolve(msg.text);
             }
         });
-        telegramBot.on('callback_query', async (query) => {
-            const chatId = query.message.chat.id;
-
+        telegramBot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
             if (query.data === 'end_session') {
-                reject({ id: id, message: 'Close' });
+                reject({ id: userId, message: 'Close' });
             }
         });
 
         setTimeout(() => {
-            reject(id);
+            reject(userId);
         }, 300000);
     });
 };
 
-export const answerTimer = (id) => {
+export const answerTimer = (userId: string) => {
     return new Promise((resolve, reject) => {
         telegramBot.on('message', (msg) => {
-            if (msg.chat.id === Number(id)) {
+            if (msg.chat.id === Number(userId)) {
                 resolve(msg.text);
             }
         });
-        telegramBot.on('callback_query', async (query) => {
+        telegramBot.on('callback_query', async (query: TelegramBot.CallbackQuery) => {
             //const chatId = query.message.chat.id;
 
             if (query.data === 'end_session') {
-                reject({ id: id, message: 'Close' });
+                reject({ id: userId, message: 'Close' });
             }
         });
 
         setTimeout(() => {
-            reject(id);
+            reject(userId);
         }, 300000);
     });
 };
